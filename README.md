@@ -14,7 +14,7 @@ Membuat topologi dengan kriteria WISE sebagai DNS Server, Westalis sebagai DHCP 
 
 **Penjelasan**
 
-1. Berikut adalah hasil topology yang telah kami buat:
+1. Berikut adalah hasil topologi yang telah kami buat:
    ![image](https://user-images.githubusercontent.com/49820990/201512418-521ab983-8732-42a7-8de6-0b67cd8ae3a5.png)
 2. Kemudian ubah konfigurasi untuk masing-masing node:
 
