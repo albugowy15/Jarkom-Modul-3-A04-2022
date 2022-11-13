@@ -435,33 +435,93 @@ loid-work.com
 franky-work.com
 ```
 
-4. Edit `/etc/squid/squid.conf`
+### Nomor 1
 
 ```bash
 include /etc/squid/acl.conf
+
+http_port 8080
+visible_hostname Berlint
+
+http_access deny WORKING
+http_access allow all
+' > /etc/squid/squid.conf
+```
+
+### Nomor 2
+```bash
+echo '
+include /etc/squid/acl.conf
+
+http_port 8080
+visible_hostname Berlint
+
+acl WORKSITES dstdomain "/etc/squid/work-sites.acl"
+http_access allow WORKSITES
+http_access deny WORKING
+http_access allow all
+' > /etc/squid/squid.conf
+```
+
+### Nomor 3
+```bash
+echo '
+include /etc/squid/acl.conf
+
+http_port 8080
+visible_hostname Berlint
+
+acl SSL_ports port 443
+acl WORKSITES dstdomain "/etc/squid/work-sites.acl"
+http_access deny !SSL_ports
+http_access allow WORKSITES
+http_access deny WORKING
+http_access allow all
+' > /etc/squid/squid.conf
+```
+
+### Nomor 4
+```bash
+echo ' 
+include /etc/squid/acl.conf
+
+http_port 8080
+visible_hostname Berlint
+
+acl SSL_ports port 443
+acl WORKSITES dstdomain "/etc/squid/work-sites.acl"
+# http_access deny !SSL_ports
+http_access allow WORKSITES
+# http_access deny WORKING
+http_access allow all
+
+delay_pools 1
+delay_class 1 2
+delay_access 1 allow all
+delay_parameters 1 none 16000/16000
+'  > /etc/squid/squid.conf
+```
+
+### Nomor 5
+```bash
+echo ' 
 
 include /etc/squid/acl.conf
 
 http_port 8080
-acl SSL_ports port 443
-acl WORKSITES dstdomain "/etc/squid/work-sites.acl"
-
-http_access allow WORKSITES WORKING !SSL_ports
-
-http_access allow !WORKING !WORKSITES SSL_ports
-
-http_access deny all
-
 visible_hostname Berlint
 
+acl SSL_ports port 443
+acl WORKSITES dstdomain "/etc/squid/work-sites.acl"
+http_access deny !SSL_ports
+http_access allow WORKSITES
+http_access deny WORKING
+http_access allow all
+
+acl OPEN_TIME time MTWHF
 delay_pools 1
 delay_class 1 2
-delay_access 1 allow WEEKEND
+delay_access 1 allow !OPEN_TIME
 delay_parameters 1 none 16000/16000
-```
-
-7. Restart squid
-
-```bash
-service squid restart
+'  > /etc/squid/squid.conf
 ```
