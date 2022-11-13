@@ -68,6 +68,60 @@ iface eth0 inet static
 	gateway 10.1.2.1
 ```
 
+- Westalist
+```
+auto eth0
+iface eth0 inet static
+	address 10.1.2.4
+	netmask 255.255.255.0
+	gateway 10.1.2.1
+```
+
+- Eden
+```
+auto eth0
+iface eth0 inet static
+        address 10.1.3.2
+        netmask 255.255.255.0
+        gateway 10.1.3.1
+```
+
+- NewstonCastle
+```
+auto eth0
+iface eth0 inet static
+        address 10.1.3.3
+        netmask 255.255.255.0
+          gateway 10.1.3.1
+```
+
+- KemonoPark
+```
+auto eth0
+iface eth0 inet static
+        address 10.1.3.4
+        netmask 255.255.255.0
+        gateway 10.1.3.1
+```
+
+- SSS
+```
+auto eth0
+iface eth0 inet static
+        address 10.1.1.2
+        netmask 255.255.255.0
+        gateway 10.1.1.1
+```
+
+- Garden
+```
+auto eth0
+iface eth0 inet static
+        address 10.1.1.3
+        netmask 255.255.255.0
+        gateway 10.1.1.1
+```
+
 3. Jalankan command iptables
 
 ```bash
@@ -78,6 +132,28 @@ iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE -s 10.1.0.0/16
 
 ```bash
 echo "nameserver 192.168.122.1" > /etc/resolv.conf
+```
+
+5. Jadikan WISE sebgagi DNS Server
+```bash
+apt-get update
+apt-get install bind9 -y
+```
+
+6. Jadikan Westalist sebagai DHCP
+```bash
+apt-get update
+apt-get install isc-dhcp-server -y
+
+echo ‘
+INTERFACES=”eth0”
+‘ > /etc/default/isc-dhcp-server
+```
+
+7. Jadikan Berlint jadi Proxy
+```bash
+apt-get update
+apt-get install squid -y
 ```
 
 ## Soal 2
@@ -149,26 +225,25 @@ nano /etc/dhcp/dhcpd.conf
 4. Sesuaikan isi konfigurasinya seperti berikut
 
 ```bash
-subnet 10.1.2.0 netmask 255.255.255.0 {
-}
-
 subnet 10.1.1.0 netmask 255.255.255.0 {
-range 10.1.1.50 10.1.1.88;
-range 10.1.1.120 10.1.1.155;
-option routers 10.1.1.1;
-option broadcast-address 10.1.1.255;
-option domain-name-servers 10.1.2.2;
-default-lease-time 300;
-max-lease-time 6900;
+        range 10.1.1.50 10.1.1.88;
+        range 10.1.1.120 10.1.1.155;
+        option routers 10.1.1.1;
+        option broadcast-address 10.1.1.255;
+        option domain-name-servers 10.1.2.2;
+        default-lease-time 300;
+        max-lease-time 6900;
+}
+subnet 10.1.2.0 netmask 255.255.255.0{
 }
 
 subnet 10.1.3.0 netmask 255.255.255.0 {
-range 10.1.3.10 10.1.3.30;
-option routers 10.1.3.1;
-option broadcast-address 10.1.3.255;
-option domain-name-servers 10.1.2.2;
-default-lease-time 600;
-max-lease-time 6900;
+	range 10.1.3.10 10.1.3.30;
+	option routers 10.1.3.1;
+	option broadcast-address 10.1.3.255;
+	option domain-name-servers 10.1.2.2;
+	default-lease-time 600;
+	max-lease-time 6900;
 }
 ```
 
@@ -223,11 +298,70 @@ options {
 };
 ```
 
-4. Restart bind9
+4. Bikin folder `/etc/bind/domain`
+```bash
+mkdir -p /etc/bind/domain
+```
+
+5. Edit file `/etc/bind/named.conf.local`
+```bash
+zone "loid-work.com" {
+        type master;
+        file "/etc/bind/domain/loid-work.com";
+};
+zone "franky-work.com" {
+        type master;
+        file "/etc/bind/domain/franky-work.com";
+};
+```
+
+6. Copy `/etc/bind/db.local` ke folder tiap domain
+```bash
+cp /etc/bind/db.local /etc/bind/domain/loid-work.com
+cp /etc/bind/db.local /etc/bind/domain/franky-work.com
+```
+
+7. Edit file di `/etc/bind/domain/loid-work.com` dan `/etc/bind/domain/franky-work.com`
+```bash
+;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     franky-work.com. root.franky-work.com. (
+                              2         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      franky-work.com.
+@       IN      A       10.1.2.2
+@       IN      AAAA    ::1 
+```
 
 ```bash
-service bind9 restart
+;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     loid-work.com. root.loid-work.com. (
+                              2         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      loid-work.com.
+@       IN      A       10.1.2.2
+@       IN      AAAA    ::1 
 ```
+
+8. Restart westails dan ostania
+```bash
+service isc-dhcp-server restart
+service isc-dhcp-relay restart
+```
+
 
 ## Soal 7
 
@@ -244,9 +378,9 @@ nano /etc/dhcp/dhcpd.conf
 2. Tambahkan konfigurasi seperti ini
 
 ```bash
-host Skypie {
-    hardware ethernet 4a:00:cf:47:fe:b7;
-    fixed-address 10.1.3.69;
+host Eden {
+    hardware ethernet 1e:71:20:29:02:a5;
+    fixed-address 10.1.3.13;
 }
 ```
 
@@ -288,133 +422,46 @@ apt-get install libapache2-mod-php7.0 -y
 apt-get install squid -y
 ```
 
-2. Edit `/etc/squid/squid.conf`
+2. Edit `/etc/squid/acl.conf`
 
 ```bash
-nano /etc/squid/squid.conf
+acl WORKING time MTWHF 08:00-17:00
+acl WEEKEND time AS 00:00-23:59
 ```
 
-3. Sesuaikan isinya seperti berikut
-
-```bash
-http_port 5000
-visible_hostname Berlint
-#http_access allow all
-```
-
-4. Edit `/etc/squid/acl.conf`
-
-```bash
-nano /etc/squid/acl.conf
-```
-
-```bash
-acl AVAILABLE_WORKING time MTWHF 08:00-17:00
-acl AVAILABLE_WORKING time AS 00:00-23:59
-```
-
-5. Edit `/etc/squid/squid.conf`
-
-```bash
-nano /etc/squid/squid.conf
-```
-
-```bash
-include /etc/squid/acl.conf
-
-http_port 8080
-acl SSL_ports port 443
-acl WORKSITES dstdomain "/etc/squid/work-sites.acl"
-http_access deny !SSL_ports
-http_access allow WORKSITES
-http_access allow AVAILABLE_WORKING
-http_access deny all
-visible_hostname Berlint
-```
-
-6. Edit `/etc/squid/work-sites.acl`
-
-```bash
-nano /etc/squid/work-sites.acl
-```
-
+3. Edit `/etc/squid/work-sites.acl`
 ```bash
 loid-work.com
 franky-work.com
 ```
 
+4. Edit `/etc/squid/squid.conf`
+
+```bash
+include /etc/squid/acl.conf
+
+include /etc/squid/acl.conf
+
+http_port 8080
+acl SSL_ports port 443
+acl WORKSITES dstdomain "/etc/squid/work-sites.acl"
+
+http_access allow WORKSITES WORKING !SSL_ports
+
+http_access allow !WORKING !WORKSITES SSL_ports
+
+http_access deny all
+
+visible_hostname Berlint
+
+delay_pools 1
+delay_class 1 2
+delay_access 1 allow WEEKEND
+delay_parameters 1 none 16000/16000
+```
+
 7. Restart squid
 
 ```bash
-service squid start
-```
-
-### Konfigurasi WISE
-
-1. Buat folder `/etc/bind/domain`
-
-```bash
-mkdir -p /etc/bind/domain
-```
-
-2. Edit file `/etc/bind/named.conf.local` dan sesuaikan isinya seperti berikut
-
-```bash
-zone "loid-work.com" {
-    type master;
-    file "/etc/bind/domain/loid-work.com";
-};
-
-zone "franky-work.com" {
-    type master;
-    file "/etc/bind/domain/franky-work.com";
-};
-```
-
-3. Edit file `/etc/bind/domain/franky-work.com`
-
-```bash
-nano /etc/bind/domain/franky-work.com
-```
-
-```bash$TTL 604800
-@       IN      SOA     franky-work.com.    root.franky-work.com. (
-                             2           ; Serial
-                        604800           ; Refresh
-                         86400           ; Retry
-                       2419200           ; Expire
-                        604800 )         ; Negative Cache TTL
-;
-@       IN      NS      franky-work.com.
-@       IN      A       10.1.2.2
-@       IN      AAAA    ::1
-```
-
-4. Edit file `/etc/bind/domain/loid-work.com`
-
-```bash
-nano /etc/bind/domain/loid-work.com
-```
-
-```bash
-;
-; BIND data file for local loopback interface
-;
-$TTL    604800
-@       IN      SOA     loid-work.com.      root.loid-work.com. (
-                             2           ; Serial
-                        604800           ; Refresh
-                         86400           ; Retry
-                       2419200           ; Expire
-                        604800 )         ; Negative Cache TTL
-;
-@       IN      NS      loid-work.com.
-@       IN      A       10.1.3.2
-@       IN      AAAA    ::1
-```
-
-5. Restart bind9
-
-```bash
-service bind9 restart
+service squid restart
 ```
