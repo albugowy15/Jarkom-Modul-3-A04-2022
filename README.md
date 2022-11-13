@@ -13,7 +13,7 @@
 Membuat topologi seperti pada soal dengan WISE sebagai DNS Server, Westalis sebagai DHCP Server, Berlint sebagai Proxy Server.
 
 1. Berikut ss topology yang kami buat
-   ![image](https://user-images.githubusercontent.com/49820990/201507126-659d1f94-60a3-49ec-a1cf-b476816d4f88.png)
+   ![image](https://user-images.githubusercontent.com/49820990/201512418-521ab983-8732-42a7-8de6-0b67cd8ae3a5.png)
 2. Kemudian ubah konfigurasi untuk masing-masing node
 
 - Ostania
