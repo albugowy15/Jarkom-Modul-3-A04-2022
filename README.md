@@ -435,8 +435,7 @@ loid-work.com
 franky-work.com
 ```
 
-### Nomor 1
-
+#### Nomor 1
 ```bash
 include /etc/squid/acl.conf
 
@@ -448,7 +447,7 @@ http_access allow all
 ' > /etc/squid/squid.conf
 ```
 
-### Nomor 2
+#### Nomor 2
 ```bash
 echo '
 include /etc/squid/acl.conf
@@ -463,7 +462,7 @@ http_access allow all
 ' > /etc/squid/squid.conf
 ```
 
-### Nomor 3
+#### Nomor 3
 ```bash
 echo '
 include /etc/squid/acl.conf
@@ -480,7 +479,7 @@ http_access allow all
 ' > /etc/squid/squid.conf
 ```
 
-### Nomor 4
+#### Nomor 4
 ```bash
 echo ' 
 include /etc/squid/acl.conf
@@ -502,10 +501,9 @@ delay_parameters 1 none 16000/16000
 '  > /etc/squid/squid.conf
 ```
 
-### Nomor 5
+#### Nomor 5
 ```bash
 echo ' 
-
 include /etc/squid/acl.conf
 
 http_port 8080
