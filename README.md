@@ -10,11 +10,13 @@
 
 ## Soal 1
 
-Membuat topologi seperti pada soal dengan WISE sebagai DNS Server, Westalis sebagai DHCP Server, Berlint sebagai Proxy Server.
+Membuat topologi dengan kriteria WISE sebagai DNS Server, Westalis sebagai DHCP Server, Berlint sebagai Proxy Server.
 
-1. Berikut ss topology yang kami buat
+**Penjelasan**
+
+1. Berikut adalah hasil topology yang telah kami buat:
    ![image](https://user-images.githubusercontent.com/49820990/201512418-521ab983-8732-42a7-8de6-0b67cd8ae3a5.png)
-2. Kemudian ubah konfigurasi untuk masing-masing node
+2. Kemudian ubah konfigurasi untuk masing-masing node:
 
 - Ostania
 
@@ -160,6 +162,8 @@ apt-get install squid -y
 
 Membuat Ostania sebagai DHCP Relay
 
+**Penjelasan**
+
 ### Konfigurasi Ostania
 
 1. Install `isc-dhcp-relay` pada Ostania
@@ -199,6 +203,8 @@ apt-get install isc-dhcp-server -y
 ## Soal 3, 4, 5, 6
 
 Semua client yang ada HARUS menggunakan konfigurasi IP dari DHCP Server. Client yang melalui Switch1 mendapatkan range IP dari `10.1.1.50` - `10.1.1.88` dan `10.1.1.120` - `10.1.1.155`. Client yang melalui Switch3 mendapatkan range IP dari `10.1.3.10` - `10.1.3.30` dan `10.1.3.60` - `10.1.3.85`. Client mendapatkan DNS dari WISE dan client dapat terhubung dengan internet melalui DNS tersebut. Lama waktu DHCP server meminjamkan alamat IP kepada Client yang melalui Switch1 selama 5 menit sedangkan pada client yang melalui Switch3 selama 10 menit. Dengan waktu maksimal yang dialokasikan untuk peminjaman alamat IP selama 115 menit.
+
+**Penjelasan**
 
 ### Konfigurasi Westalist
 
@@ -367,6 +373,8 @@ service isc-dhcp-relay restart
 
 Menjadikan Eden sebagai server untuk pertukaran informasi dengan alamat IP yang tetap dengan IP `10.1.3.13`
 
+**Penjelasan**
+
 ### Konfigurasi Westalist
 
 1. Edit `/etc/dhcp/dhcpd.conf`
@@ -411,6 +419,8 @@ Pada Proxy Server di Berlint, Loid berencana untuk mengatur bagaimana Client dap
 3. Saat akses internet dibuka, client dilarang untuk mengakses web tanpa HTTPS. (Contoh web HTTP: http://example.com)
 4. Agar menghemat penggunaan, akses internet dibatasi dengan kecepatan maksimum 128 Kbps pada setiap host (Kbps = kilobit per second; lakukan pengecekan pada tiap host, ketika 2 host akses internet pada saat bersamaan, keduanya mendapatkan speed maksimal yaitu 128 Kbps)
 5. Setelah diterapkan, ternyata peraturan nomor (4) mengganggu produktifitas saat hari kerja, dengan demikian pembatasan kecepatan hanya diberlakukan untuk pengaksesan internet pada hari libur
+
+**Penjelasan**
 
 ### Konfigurasi Berlint
 
